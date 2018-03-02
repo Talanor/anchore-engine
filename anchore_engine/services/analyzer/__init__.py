@@ -427,7 +427,7 @@ def handle_layer_cache():
                 if totalsize > cachemax:
                     logger.debug("layer cache total size ("+str(totalsize)+") exceeds configured cache max ("+str(cachemax)+") - performing cleanup")
                     currsize = totalsize
-                    sorted_layers = sorted(layertimes.items(), key=operator.itemgetter(1))
+                    sorted_layers = sorted(list(layertimes.items()), key=operator.itemgetter(1))
                     while(currsize > cachemax):
                         rmlayer = sorted_layers.pop(0)
                         logger.debug("removing cached layer: " + str(rmlayer))
@@ -486,7 +486,7 @@ def monitor_func(**kwargs):
                     if qobj:
                         myqobj = copy.deepcopy(qobj)
                         logger.spew("incoming queue object: " + str(myqobj))
-                        logger.debug("incoming queue task: " + str(myqobj.keys()))
+                        logger.debug("incoming queue task: " + str(list(myqobj.keys())))
                         logger.debug("starting thread")
                         athread = threading.Thread(target=process_analyzer_job, args=(system_user_auth, myqobj,layer_cache_enable))
                         athread.start()

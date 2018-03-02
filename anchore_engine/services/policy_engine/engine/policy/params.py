@@ -104,7 +104,7 @@ class BooleanStringValidator(JsonSchemaValidator):
     }
 
     def validate(self, value):
-        value = unicode(value).lower() # handle any weird unicode chars
+        value = str(value).lower() # handle any weird unicode chars
         return super(BooleanStringValidator, self).validate(value)
 
 
@@ -135,7 +135,7 @@ class RegexParamValidator(JsonSchemaValidator):
         :param kwargs:
         :return:
         """
-        if type(value) not in [str, unicode]:
+        if type(value) not in [str, str]:
             return False
         return re.match(self.regex, value) is not None
 

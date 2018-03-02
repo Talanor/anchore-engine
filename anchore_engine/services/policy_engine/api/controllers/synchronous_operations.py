@@ -496,7 +496,7 @@ def describe_policy():
 
                 params = t._parameters()
                 if params:
-                    for param in params.values():
+                    for param in list(params.values()):
                         tps = TriggerParamSpec()
                         tps.name = param.name
                         tps.description = param.description

@@ -625,7 +625,7 @@ class ImagePackageVulnerability(Base):
         if self.vulnerability.fixed_in:
             name_matches = [self.pkg_name, self.package.normalized_src_pkg]
             fix_candidates = self.vulnerability.fixed_in
-            fixes_in = filter(lambda x: x.name in name_matches, fix_candidates)
+            fixes_in = [x for x in fix_candidates if x.name in name_matches]
             fix_available_in = fixes_in[0].version if fixes_in else None
             if fix_available_in == 'None':
                 fix_available_in = None

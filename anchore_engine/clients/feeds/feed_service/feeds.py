@@ -2,7 +2,7 @@ import requests
 import requests.exceptions
 import base64
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import copy
 import datetime
 
@@ -16,11 +16,11 @@ from anchore_engine.clients.feeds import Feed, FeedGroup, FeedGroupList, FeedLis
 
 #SINCE_DATE_FORMAT = '%Y-%m-%dT%H:%M' # Minute-level granularity for the since parameter only
 
-class InsufficientAccessTierError(StandardError):
+class InsufficientAccessTierError(Exception):
     pass
 
 
-class InvalidCredentialsError(StandardError):
+class InvalidCredentialsError(Exception):
     def __init__(self, username, target):
         super(InvalidCredentialsError, self).__init__('Invalid credential for user {} for url: {}'.format(username, target))
 
@@ -190,8 +190,8 @@ class Oauth2AuthenticatedClient(object):
 
         username = self.anchore_auth['username']
         password = self.anchore_auth['password']
-        url_username = urllib.quote_plus(username)
-        url_password = urllib.quote_plus(password)
+        url_username = urllib.parse.quote_plus(username)
+        url_password = urllib.parse.quote_plus(password)
         client_info_url = self.anchore_auth['client_info_url']
         token_url = self.anchore_auth['token_url']
         client_info = self.anchore_auth['client_info']

@@ -55,7 +55,7 @@ def tsget_all(userId, imageDigest, tag, policyId=None, session=None):
 
     if results:
         for result in results:
-            obj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+            obj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
             ret.append(obj)
 
     return(ret)
@@ -73,7 +73,7 @@ def tsget_all_bytag(userId, tag, policyId=None, session=None):
 
     if results:
         for result in results:
-            obj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+            obj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
             ret.append(obj)
 
     return(ret)
@@ -101,7 +101,7 @@ def tsget_byfilter(userId, session=None, **dbfilter):
     results = session.query(PolicyEval).filter_by(**dbfilter).order_by(desc(PolicyEval.created_at))
     if results:
         for result in results:
-            obj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+            obj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
             ret.append(obj)
 
     return(ret)
@@ -136,7 +136,7 @@ def get_all(session=None):
 
     our_results = session.query(PolicyEval)
     for result in our_results:
-        obj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+        obj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
         ret.append(obj)
 
     return(ret)
@@ -154,7 +154,7 @@ def get(userId, imageDigest, tag, policyId=None, session=None):
         result = session.query(PolicyEval).filter_by(userId=userId, imageDigest=imageDigest, tag=tag).order_by(desc(PolicyEval.created_at)).first()
 
     if result:
-        obj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+        obj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
         ret = obj
 
     return(ret)

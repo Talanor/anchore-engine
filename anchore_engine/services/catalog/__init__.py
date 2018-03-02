@@ -1054,7 +1054,7 @@ bundle_user_is_updated = {}
 def monitor_func(**kwargs):
     global click, running, last_run, threads, system_user_auth
 
-    for threadname in threads.keys():
+    for threadname in list(threads.keys()):
         if not threads[threadname]['thread'] and not threads[threadname]['last_run']:
             # thread has never run, set up the timers from configuration if necessary
             if 'cycle_timers' in kwargs and threadname in kwargs['cycle_timers']:
@@ -1098,7 +1098,7 @@ def monitor_func(**kwargs):
 
         logger.spew("MEM: mon_func start: " + str(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss))
 
-        for threadname in threads.keys():
+        for threadname in list(threads.keys()):
             if not threads[threadname]['thread']:
                 if ( int(time.time()) - threads[threadname]['last_run'] ) > threads[threadname]['cycle_timer']:
                     logger.debug("thread starting: " + str(threadname))
@@ -1108,7 +1108,7 @@ def monitor_func(**kwargs):
                     logger.debug("thread cycle: not time to run thread: " + str(threadname) + " : " + str(int(time.time()) - threads[threadname]['last_run']) + " : " + str(threads[threadname]['cycle_timer']))
 
         logger.debug("joining threads")
-        for threadname in threads.keys():
+        for threadname in list(threads.keys()):
             thread = threads[threadname]['thread']
             if thread:
                 if thread.isAlive():

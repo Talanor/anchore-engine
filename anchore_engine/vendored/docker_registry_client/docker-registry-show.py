@@ -15,10 +15,10 @@ limitations under the License.
 """
 
 
-from __future__ import absolute_import
+
 
 import argparse
-from docker_registry_client import DockerRegistryClient
+from .docker_registry_client import DockerRegistryClient
 import json
 import logging
 import requests
@@ -91,43 +91,43 @@ class CLI(object):
                 raise
         else:
             print("Repositories:")
-            for repository in repositories.keys():
-                print("  - {0}".format(repository))
+            for repository in list(repositories.keys()):
+                print(("  - {0}".format(repository)))
 
     def show_tags(self, client, repository):
         try:
             repo = client.repository(repository)
         except requests.HTTPError as e:
             if e.response.status_code == requests.codes.not_found:
-                print("Repository {0} not found".format(repository))
+                print(("Repository {0} not found".format(repository)))
             else:
                 raise
         else:
-            print("Tags in repository {0}:".format(repository))
+            print(("Tags in repository {0}:".format(repository)))
             for tag in repo.tags():
-                print("  - {0}".format(tag))
+                print(("  - {0}".format(tag)))
 
     def show_manifest(self, client, repository, ref):
         try:
             repo = client.repository(repository)
         except requests.HTTPError as e:
             if e.response.status_code == requests.codes.not_found:
-                print("Repository {0} not found".format(repository))
+                print(("Repository {0} not found".format(repository)))
             else:
                 raise
         else:
             assert client.api_version in [1, 2]
             if client.api_version == 2:
                 manifest, digest = repo.manifest(ref)
-                print("Digest: {0}".format(digest))
+                print(("Digest: {0}".format(digest)))
                 print("Manifest:")
-                print(json.dumps(manifest, indent=2, sort_keys=True))
+                print((json.dumps(manifest, indent=2, sort_keys=True)))
             else:
                 image = repo.image(ref)
                 image_json = image.get_json()
-                print("Image ID: {0}".format(image.image_id))
+                print(("Image ID: {0}".format(image.image_id)))
                 print("Image JSON:")
-                print(json.dumps(image_json, indent=2, sort_keys=True))
+                print((json.dumps(image_json, indent=2, sort_keys=True)))
 
 
 if __name__ == '__main__':

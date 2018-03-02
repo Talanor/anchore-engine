@@ -22,11 +22,11 @@ class Anchore(Base):
     scanner_version = Column(String)
 
     def json(self):
-        thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+        thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
         return (json.dumps(thedata))
 
     def update(self, inobj):
-        for a in inobj.keys():
+        for a in list(inobj.keys()):
             if hasattr(self, a):
                 setattr(self, a, inobj[a])
 
@@ -49,11 +49,11 @@ class ArchiveDocument(Base):
     jsondata = Column(String)
 
     def json(self):
-        thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+        thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
         return (json.dumps(thedata))
 
     def update(self, inobj):
-        for a in inobj.keys():
+        for a in list(inobj.keys()):
             if hasattr(self, a):
                 setattr(self, a, inobj[a])
 
@@ -75,11 +75,11 @@ class User(Base):
     active = Column(Boolean)
 
     def json(self):
-        thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+        thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
         return (json.dumps(thedata))
 
     def update(self, inobj):
-        for a in inobj.keys():
+        for a in list(inobj.keys()):
             if hasattr(self, a):
                 setattr(self, a, inobj[a])
 
@@ -102,11 +102,11 @@ class EventLog(Base):
     detail = Column(String)
 
     def json(self):
-        thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+        thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
         return (json.dumps(thedata))
 
     def update(self, inobj):
-        for a in inobj.keys():
+        for a in list(inobj.keys()):
             if hasattr(self, a):
                 setattr(self, a, inobj[a])
 
@@ -129,11 +129,11 @@ class QueueItem(Base):
     max_tries = Column(Integer)
 
     def json(self):
-        thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+        thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
         return (json.dumps(thedata))
 
     def update(self, inobj):
-        for a in inobj.keys():
+        for a in list(inobj.keys()):
             if hasattr(self, a):
                 setattr(self, a, inobj[a])
 
@@ -154,11 +154,11 @@ if True:
         qlen = Column(BigInteger, default=0)
 
         def json(self):
-            thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+            thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
             return (json.dumps(thedata))
 
         def update(self, inobj):
-            for a in inobj.keys():
+            for a in list(inobj.keys()):
                 if hasattr(self, a):
                     setattr(self, a, inobj[a])
 
@@ -184,11 +184,11 @@ if True:
         max_tries = Column(Integer, default=0)
 
         def json(self):
-            thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+            thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
             return (json.dumps(thedata))
 
         def update(self, inobj):
-            for a in inobj.keys():
+            for a in list(inobj.keys()):
                 if hasattr(self, a):
                     setattr(self, a, inobj[a])
 
@@ -218,11 +218,11 @@ class Subscription(Base):
         return (ret)
 
     def json(self):
-        thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+        thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
         return (json.dumps(thedata))
 
     def update(self, inobj):
-        for a in inobj.keys():
+        for a in list(inobj.keys()):
             if hasattr(self, a):
                 setattr(self, a, inobj[a])
 
@@ -254,11 +254,11 @@ if False:
             return (ret)
 
         def json(self):
-            thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+            thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
             return (json.dumps(thedata))
 
         def update(self, inobj):
-            for a in inobj.keys():
+            for a in list(inobj.keys()):
                 if hasattr(self, a):
                     setattr(self, a, inobj[a])
 
@@ -299,11 +299,11 @@ class CatalogImage(Base):
         return (ret)
 
     def json(self):
-        thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+        thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
         return (json.dumps(thedata))
 
     def update(self, inobj):
-        for a in inobj.keys():
+        for a in list(inobj.keys()):
             if hasattr(self, a):
                 setattr(self, a, inobj[a])
 
@@ -336,11 +336,11 @@ class CatalogImageDocker(Base):
         return (ret)
 
     def json(self):
-        thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+        thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
         return (json.dumps(thedata))
 
     def update(self, inobj):
-        for a in inobj.keys():
+        for a in list(inobj.keys()):
             if hasattr(self, a):
                 setattr(self, a, inobj[a])
 
@@ -363,11 +363,11 @@ class PolicyBundle(Base):
     # policybundle = Column(String)
 
     def json(self):
-        thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+        thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
         return (json.dumps(thedata))
 
     def update(self, inobj):
-        for a in inobj.keys():
+        for a in list(inobj.keys()):
             if hasattr(self, a):
                 setattr(self, a, inobj[a])
 
@@ -399,8 +399,8 @@ class PolicyEval(Base):
         return (ret)
 
     def content_compare(self, other):
-        selfdata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
-        otherdata = dict((key, value) for key, value in vars(other).iteritems() if not key.startswith('_'))
+        selfdata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
+        otherdata = dict((key, value) for key, value in list(vars(other).items()) if not key.startswith('_'))
         for k in ['userId', 'imageDigest', 'tag', 'policyId', 'final_action']:
             try:
                 if selfdata[k] != otherdata[k]:
@@ -410,11 +410,11 @@ class PolicyEval(Base):
         return (True)
 
     def json(self):
-        thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+        thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
         return (json.dumps(thedata))
 
     def update(self, inobj):
-        for a in inobj.keys():
+        for a in list(inobj.keys()):
             if hasattr(self, a):
                 setattr(self, a, inobj[a])
 
@@ -449,11 +449,11 @@ class Service(Base):
         return (ret)
 
     def json(self):
-        thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+        thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
         return (json.dumps(thedata))
 
     def update(self, inobj):
-        for a in inobj.keys():
+        for a in list(inobj.keys()):
             if hasattr(self, a):
                 setattr(self, a, inobj[a])
 
@@ -478,11 +478,11 @@ class Registry(Base):
     registry_meta = Column(String)
 
     def json(self):
-        thedata = dict((key, value) for key, value in vars(self).iteritems() if not key.startswith('_'))
+        thedata = dict((key, value) for key, value in list(vars(self).items()) if not key.startswith('_'))
         return (json.dumps(thedata))
 
     def update(self, inobj):
-        for a in inobj.keys():
+        for a in list(inobj.keys()):
             if hasattr(self, a):
                 setattr(self, a, inobj[a])
 

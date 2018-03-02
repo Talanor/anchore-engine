@@ -23,7 +23,7 @@ class TestAnchoreIOFeedClient(unittest.TestCase):
             try:
                 test_client.list_feed_groups(f.name)
             except Exception as e:
-                print('Caught: {} for feed:  {}'.format(e, f))
+                print(('Caught: {} for feed:  {}'.format(e, f)))
         test_client.get_feed_group_data('vulnerabilities', 'debian:8',since=datetime.datetime.utcnow())
 
     def test_registered_user(self):
@@ -38,9 +38,9 @@ class TestAnchoreIOFeedClient(unittest.TestCase):
             try:
                 groups = test_client.list_feed_groups(f.name)
                 for g in groups.groups:
-                    print('Feed {} Group {}'.format(f.name, g.name))
+                    print(('Feed {} Group {}'.format(f.name, g.name)))
             except Exception as e:
-                print('Caught: {} for feed:  {}'.format(e, f))
+                print(('Caught: {} for feed:  {}'.format(e, f)))
 
 
     def test_auth_error(self):
@@ -64,7 +64,7 @@ class TestAnchoreIOFeedClient(unittest.TestCase):
             try:
                 test_client.list_feed_groups(f.name)
             except Exception as e:
-                print('Caught: {} for feed:  {}'.format(e, f))
+                print(('Caught: {} for feed:  {}'.format(e, f)))
 
 
         next_token = False
@@ -74,15 +74,15 @@ class TestAnchoreIOFeedClient(unittest.TestCase):
             print('Getting a page of data')
             if next_token:
                 last_token = next_token
-                print('Using token: {}'.format(next_token))
+                print(('Using token: {}'.format(next_token)))
                 data = test_client.get_feed_group_data('vulnerabilities', 'debian:8', since=since_time, next_token=next_token)
                 next_token = data.next_token
-                print('Got {} items and new next token: {}'.format(len(data.data), next_token))
+                print(('Got {} items and new next token: {}'.format(len(data.data), next_token)))
             else:
                 last_token = None
                 data = test_client.get_feed_group_data('vulnerabilities', 'debian:8', since=since_time)
                 next_token = data.next_token
-                print('Got {} items and new next token: {}'.format(len(data.data), next_token))
+                print(('Got {} items and new next token: {}'.format(len(data.data), next_token)))
 
             if next_token:
                 self.assertNotEqual(next_token, last_token)

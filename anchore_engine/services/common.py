@@ -3,7 +3,7 @@ import os
 import re
 import copy
 import time
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import attr
 import hashlib
 import traceback
@@ -64,17 +64,17 @@ def update_image_record_with_analysis_data(image_record, image_data):
             ddata = air.pop('docker_data', {})
 
             summary_record['layer_count'] = str(len(al))
-            summary_record['dockerfile_mode'] = air.pop('dockerfile_mode', 'N/A') 
-            summary_record['arch'] = ddata.pop('Architecture', 'N/A')            
-            summary_record['image_size'] = str(int(airm.pop('sizebytes', 0))) 
+            summary_record['dockerfile_mode'] = air.pop('dockerfile_mode', 'N/A')
+            summary_record['arch'] = ddata.pop('Architecture', 'N/A')
+            summary_record['image_size'] = str(int(airm.pop('sizebytes', 0)))
 
-            formatted_image_summary_data = summary_record            
+            formatted_image_summary_data = summary_record
     except Exception as err:
         formatted_image_summary_data = {}
 
     if formatted_image_summary_data:
         image_record.update(formatted_image_summary_data)
-        
+
     dockerfile_content, dockerfile_mode = extract_dockerfile_content(image_data)
     if dockerfile_content and dockerfile_mode:
         image_record['dockerfile_mode'] = dockerfile_mode
@@ -140,9 +140,9 @@ if False:
                 ddata = air.pop('docker_data', {})
 
                 summary_record['layer_count'] = str(len(al))
-                summary_record['dockerfile_mode'] = air.pop('dockerfile_mode', 'N/A') 
-                summary_record['arch'] = ddata.pop('Architecture', 'N/A')            
-                summary_record['image_size'] = str(int(airm.pop('sizebytes', 0))) 
+                summary_record['dockerfile_mode'] = air.pop('dockerfile_mode', 'N/A')
+                summary_record['arch'] = ddata.pop('Architecture', 'N/A')
+                summary_record['image_size'] = str(int(airm.pop('sizebytes', 0)))
 
                 ret = summary_record
 
@@ -224,13 +224,13 @@ def check_services_ready(servicelist):
 
         service_records = latest_service_records['service_records']
         for service_record in service_records:
-            if service_record['servicename'] in required_services_up.keys():
+            if service_record['servicename'] in list(required_services_up.keys()):
                 if service_record['status']:
                     required_services_up[service_record['servicename']] = True
 
         all_ready = True
-        logger.debug("checking service readiness: " + str(required_services_up.keys()))
-        for servicename in required_services_up.keys():
+        logger.debug("checking service readiness: " + str(list(required_services_up.keys())))
+        for servicename in list(required_services_up.keys()):
             if not required_services_up[servicename]:
                 logger.warn("required service ("+str(servicename)+") is not (yet) available - will not queue analysis tasks this cycle")
                 all_ready = False
@@ -276,7 +276,7 @@ def createServiceAPI(resource, sname, config):
                 sfact = ssl.CertificateOptions(privateKey=ssl_data['ssl_key'], certificate=ssl_data['ssl_cert'], extraCertChain=[ssl_data['ssl_chain']])
             else:
                 sfact = ssl.CertificateOptions(privateKey=ssl_data['ssl_key'], certificate=ssl_data['ssl_cert'])
-                
+
             #skey = myconfig['ssl_key']
             #scert = myconfig['ssl_cert']
             #sfact = ssl.DefaultOpenSSLContextFactory(skey, scert)
@@ -367,6 +367,7 @@ def makeService(snames, options, db_connect=True, bootstrap_db=False, bootstrap_
             for sname in snames:
                 if sname in localconfig['services'] and localconfig['services'][sname]['enabled']:
 
+                    logger.info("Trying to load module: '" + module_name + "." + sname + "'")
                     smodule = importlib.import_module(module_name + "." + sname)
 
                     s = smodule.createService(sname, localconfig)
@@ -396,7 +397,7 @@ def makeService(snames, options, db_connect=True, bootstrap_db=False, bootstrap_
 
         if not success:
             logger.error("cannot start service (see above for information)")
-            traceback.print_exc('Service init failure')
+            traceback.print_exc()
             raise Exception("cannot start service (see above for information)")
 
         return(retservice)
@@ -414,7 +415,7 @@ class HealthResource(Resource):
 class HTTPAuthRealm(object):
     resource = attr.ib()
 
-    def requestAvatar(self, avatarId, mind, *interfaces):        
+    def requestAvatar(self, avatarId, mind, *interfaces):
         #
         # to do route based auth, something like this (plus the anon portal setup in getResource())
         #
@@ -437,7 +438,7 @@ def getAuthResource(in_resource, sname, config, password_checker=AnchorePassword
     else:
         # no auth required
         return(in_resource)
-        
+
     do_auth = True
     if localconfig and 'require_auth' in localconfig and not localconfig['require_auth']:
         do_auth = False
@@ -446,7 +447,7 @@ def getAuthResource(in_resource, sname, config, password_checker=AnchorePassword
     #if localconfig and 'require_auth' in localconfig and localconfig['require_auth']:
         #if 'require_auth_file' not in localconfig or not os.path.exists(localconfig['require_auth_file']):
         #    raise Exception("require_auth is set for service, but require_auth_file is not set/invalid")
-            
+
         realm = HTTPAuthRealm(resource=in_resource)
         portal = Portal(realm, [password_checker])
 
@@ -463,7 +464,7 @@ def getAuthResource(in_resource, sname, config, password_checker=AnchorePassword
         #        AllowAnonymousAccess(),
         #    ],
         #)
-        
+
         credential_factory = BasicCredentialFactory('Authentication required')
         #credential_factory = DigestCredentialFactory('md5', 'anchore')
         resource = HTTPAuthSessionWrapper(portal, [credential_factory])
@@ -482,7 +483,7 @@ def getResource(app, sname, config):
     if localconfig and 'require_auth' in localconfig and localconfig['require_auth']:
         #if 'require_auth_file' not in localconfig or not os.path.exists(localconfig['require_auth_file']):
         #    raise Exception("require_auth is set for service, but require_auth_file is not set/invalid")
-            
+
         realm = HTTPAuthRealm(resource=app.resource())
         portal = Portal(realm, [AnchorePasswordChecker()])
 
@@ -499,7 +500,7 @@ def getResource(app, sname, config):
         #        AllowAnonymousAccess(),
         #    ],
         #)
-        
+
         credential_factory = BasicCredentialFactory('Authentication required')
         #credential_factory = DigestCredentialFactory('md5', 'anchore')
         resource = HTTPAuthSessionWrapper(portal, [credential_factory])
@@ -526,7 +527,7 @@ def make_response_error(errmsg, in_httpcode=None, **kwargs):
         if 'anchore_error_json' in errmsg.__dict__:
             if set(['message', 'httpcode', 'detail']).issubset(set(errmsg.__dict__['anchore_error_json'])):
                 ret.update(errmsg.__dict__['anchore_error_json'])
-                
+
     return(ret)
 
 def make_response_routes(apiversion, inroutes):
@@ -590,7 +591,7 @@ def get_image_info(userId, image_type, input_string, registry_lookup=False, regi
             image_info['digest'] = digest
             image_info['fulldigest'] = image_info['registry']+"/"+image_info['repo']+"@"+digest
             image_info['manifest'] = manifest
-            
+
             # if we got a manifest, and the image_info does not yet contain an imageId, try to get it from the manifest
             if manifest and not image_info['imageId']:
                 try:
@@ -633,7 +634,7 @@ def clean_docker_image_details_for_update(image_details):
 
     for image_detail in image_details:
         el = {}
-        for k in image_detail.keys():
+        for k in list(image_detail.keys()):
             if image_detail[k] != None:
                 el[k] = image_detail[k]
         ret.append(el)
@@ -692,18 +693,18 @@ def make_docker_image(userId, input_string=None, tag=None, digest=None, imageId=
         if digest:
             image_info = get_image_info(userId, "docker", digest, registry_lookup=registry_lookup, registry_creds=registry_creds)
             digest = image_info['digest']
-            
+
         if tag:
             image_info = get_image_info(userId, "docker", tag, registry_lookup=registry_lookup, registry_creds=registry_creds)
             if digest and not image_info['digest']:
                 image_info['digest'] = digest
-        
+
     if 'digest' in image_info:
         #imageDigest = urllib.base64.urlsafe_b64encode(str(image_info['digest']))
         imageDigest = str(image_info['digest'])
     else:
         raise Exception("input image_info needs to have a digest")
-        
+
     if imageId:
         image_info['imageId'] = imageId
 
@@ -714,13 +715,13 @@ def make_docker_image(userId, input_string=None, tag=None, digest=None, imageId=
     new_input['dockerfile_mode'] = dockerfile_mode
 
     final_annotation_data = {}
-    for k,v in annotations.items():
+    for k,v in list(annotations.items()):
         if v != 'null':
             final_annotation_data[k] = v
     new_input['annotations'] = json.dumps(final_annotation_data)
-    
+
     new_image_obj = db.CatalogImage(**new_input)
-    new_image = dict((key,value) for key, value in vars(new_image_obj).iteritems() if not key.startswith('_'))
+    new_image = dict((key,value) for key, value in list(vars(new_image_obj).items()) if not key.startswith('_'))
     new_image['image_detail'] = []
 
     if image_info['tag']:
@@ -732,9 +733,9 @@ def make_docker_image(userId, input_string=None, tag=None, digest=None, imageId=
         for t in ['registry', 'repo', 'tag', 'digest', 'imageId']:
             if t in image_info:
                 new_input[t] = image_info[t]
-        
+
         new_docker_image_obj = db.CatalogImageDocker(**new_input)
-        new_docker_image = dict((key,value) for key, value in vars(new_docker_image_obj).iteritems() if not key.startswith('_'))
+        new_docker_image = dict((key,value) for key, value in list(vars(new_docker_image_obj).items()) if not key.startswith('_'))
         new_image['image_detail'] = [new_docker_image]
 
     ret = new_image
@@ -787,9 +788,9 @@ def do_request_prep(request, default_params={}):
         ret['method'] = request.method
         ret['bodycontent'] = request.get_data()
         ret['params'] = default_params
-        for param in request.args.keys():
+        for param in list(request.args.keys()):
 
-            if type(request.args[param]) in [basestring, unicode]:
+            if type(request.args[param]) in [str, str]:
                 if request.args[param].lower() == 'true':
                     val = True
                 elif request.args[param].lower() == 'false':
@@ -826,30 +827,30 @@ def extract_analyzer_content(image_data, content_type):
     try:
         idata = image_data[0]['image']
         imageId = idata['imageId']
-        
+
         if content_type == 'files':
             try:
                 fcsums = {}
                 if 'files.sha256sums' in idata['imagedata']['analysis_report']['file_checksums']:
                     adata = idata['imagedata']['analysis_report']['file_checksums']['files.sha256sums']['base']
-                    for k in adata.keys():
+                    for k in list(adata.keys()):
                         fcsums[k] = adata[k]
 
                 if 'files.allinfo' in idata['imagedata']['analysis_report']['file_list']:
                     adata = idata['imagedata']['analysis_report']['file_list']['files.allinfo']['base']
-                    for k in adata.keys():
+                    for k in list(adata.keys()):
                         avalue = json.loads(adata[k])
                         if k in fcsums:
                             avalue['sha256'] = fcsums[k]
                         ret[k] = avalue
-                        
+
             except Exception as err:
                 raise Exception("could not extract/parse content info - exception: " + str(err))
         elif content_type == 'os':
             try:
                 if 'pkgs.allinfo' in idata['imagedata']['analysis_report']['package_list']:
                     adata = idata['imagedata']['analysis_report']['package_list']['pkgs.allinfo']['base']
-                    for k in adata.keys():
+                    for k in list(adata.keys()):
                         avalue = json.loads(adata[k])
                         ret[k] = avalue
             except Exception as err:
@@ -858,7 +859,7 @@ def extract_analyzer_content(image_data, content_type):
             try:
                 if 'pkgs.npms' in idata['imagedata']['analysis_report']['package_list']:
                     adata = idata['imagedata']['analysis_report']['package_list']['pkgs.npms']['base']
-                    for k in adata.keys():
+                    for k in list(adata.keys()):
                         avalue = json.loads(adata[k])
                         ret[k] = avalue
             except Exception as err:
@@ -867,7 +868,7 @@ def extract_analyzer_content(image_data, content_type):
             try:
                 if 'pkgs.gems' in idata['imagedata']['analysis_report']['package_list']:
                     adata = idata['imagedata']['analysis_report']['package_list']['pkgs.gems']['base']
-                    for k in adata.keys():
+                    for k in list(adata.keys()):
                         avalue = json.loads(adata[k])
                         ret[k] = avalue
             except Exception as err:
@@ -876,7 +877,7 @@ def extract_analyzer_content(image_data, content_type):
             try:
                 if 'pkgs.python' in idata['imagedata']['analysis_report']['package_list']:
                     adata = idata['imagedata']['analysis_report']['package_list']['pkgs.python']['base']
-                    for k in adata.keys():
+                    for k in list(adata.keys()):
                         avalue = json.loads(adata[k])
                         ret[k] = avalue
             except Exception as err:
@@ -885,7 +886,7 @@ def extract_analyzer_content(image_data, content_type):
             try:
                 if 'pkgs.java' in idata['imagedata']['analysis_report']['package_list']:
                     adata = idata['imagedata']['analysis_report']['package_list']['pkgs.java']['base']
-                    for k in adata.keys():
+                    for k in list(adata.keys()):
                         avalue = json.loads(adata[k])
                         ret[k] = avalue
             except Exception as err:
@@ -896,7 +897,7 @@ def extract_analyzer_content(image_data, content_type):
                     ret = {'anchore_image_report': image_data[0]['image']['imagedata']['image_report'], 'anchore_distro_meta': image_data[0]['image']['imagedata']['analysis_report']['analyzer_meta']['analyzer_meta']['base']}
             except Exception as err:
                 raise Exception("could not extract/parse content info - exception: " + str(err))
-            
+
     except Exception as err:
         logger.warn("exception: " + str(err))
         raise err
@@ -944,5 +945,5 @@ def get_system_user_auth(session=None):
 
     return ( (None, None) )
 
-    
-        
+
+

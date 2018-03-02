@@ -6,7 +6,7 @@ import json
 import datetime
 import time
 import requests
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import dateutil.parser
 
 from sqlalchemy.exc import IntegrityError
@@ -51,7 +51,7 @@ class AsyncTaskMeta(type):
             cls.tasks[dct['__task_name__']] = cls
 
 
-class IAsyncTask(object):
+class IAsyncTask(object, metaclass=AsyncTaskMeta):
     """
     Base type for async tasks to ensure they are in the task registry and implement the basic interface.
 
@@ -59,7 +59,6 @@ class IAsyncTask(object):
     complete control over the db session.
 
     """
-    __metaclass__ = AsyncTaskMeta
 
     __task_name__ = None
 
@@ -416,7 +415,7 @@ class ImageLoadTask(IAsyncTask, DispatchableTaskMixin):
         :return: 
         """
 
-        split_url = urllib.splittype(url)
+        split_url = urllib.parse.splittype(url)
         if split_url[0] == 'file':
             return self._get_file(split_url[1])
         elif split_url[0] == 'catalog':

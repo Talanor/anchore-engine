@@ -27,7 +27,7 @@ def make_response_content(content_type, content_data):
     # type-specific formatting of content data
     if content_type == 'os':
         elkeys = ['license', 'origin', 'size', 'type', 'version']
-        for package in content_data.keys():
+        for package in list(content_data.keys()):
             el = {}
             try:
                 el['package'] = package
@@ -42,7 +42,7 @@ def make_response_content(content_type, content_data):
                 ret.append(el)
 
     elif content_type == 'npm':
-        for package in content_data.keys():        
+        for package in list(content_data.keys()):        
             el = {}
             try:
                 el['package'] = content_data[package]['name']
@@ -57,7 +57,7 @@ def make_response_content(content_type, content_data):
                 ret.append(el)
 
     elif content_type == 'gem':
-        for package in content_data.keys():
+        for package in list(content_data.keys()):
             el = {}
             try:
                 el['package'] = content_data[package]['name']
@@ -72,7 +72,7 @@ def make_response_content(content_type, content_data):
                 ret.append(el)
 
     elif content_type == 'python':
-        for package in content_data.keys():
+        for package in list(content_data.keys()):
             el = {}
             try:
                 el['package'] = content_data[package]['name']
@@ -87,7 +87,7 @@ def make_response_content(content_type, content_data):
                 ret.append(el)
 
     elif content_type == 'java':
-        for package in content_data.keys():
+        for package in list(content_data.keys()):
             el = {}
             try:
                 el['package'] = content_data[package]['name']
@@ -112,11 +112,11 @@ def make_response_content(content_type, content_data):
             'uid': 'uid',
             'gid': 'gid'
         }
-        for filename in content_data.keys():
+        for filename in list(content_data.keys()):
             el = {}
             try:
                 el['filename'] = filename
-                for elkey in elmap.keys():
+                for elkey in list(elmap.keys()):
                     try:
                         el[elmap[elkey]] = content_data[filename][elkey]
                     except:
@@ -162,12 +162,12 @@ def make_response_vulnerability(vulnerability_type, vulnerability_data):
         }
         scan_result = vulnerability_data['legacy_report']
         try:
-            for imageId in scan_result.keys():
+            for imageId in list(scan_result.keys()):
                 header = scan_result[imageId]['result']['header']
                 rows = scan_result[imageId]['result']['rows']
                 for row in rows:
                     el = {}
-                    for k in keymap.keys():
+                    for k in list(keymap.keys()):
                         try:
                             el[k] = row[header.index(keymap[k])]
                         except:
@@ -203,12 +203,12 @@ def make_response_query_orig(queryType, query_data):
         }
         scan_result = query_data['legacy_report']
         try:
-            for imageId in scan_result.keys():
+            for imageId in list(scan_result.keys()):
                 header = scan_result[imageId]['result']['header']
                 rows = scan_result[imageId]['result']['rows']
                 for row in rows:
                     el = {}
-                    for k in keymap.keys():
+                    for k in list(keymap.keys()):
                         try:
                             el[k] = row[header.index(keymap[k])]
                         except:
@@ -235,12 +235,12 @@ def make_response_query_orig(queryType, query_data):
         }
 
         try:
-            for imageId in query_data.keys():
+            for imageId in list(query_data.keys()):
                 header = query_data[imageId]['result']['header']
                 rows = query_data[imageId]['result']['rows']
                 for row in rows:
                     el = {}
-                    for k in keymap.keys():
+                    for k in list(keymap.keys()):
                         try:
                             el[k] = row[header.index(keymap[k])]
                         except:
@@ -277,12 +277,12 @@ def make_response_query_orig(queryType, query_data):
         }
 
         try:
-            for imageId in query_data.keys():
+            for imageId in list(query_data.keys()):
                 header = query_data[imageId]['result']['header']
                 rows = query_data[imageId]['result']['rows']
                 for row in rows:
                     el = {}
-                    for k in keymap.keys():
+                    for k in list(keymap.keys()):
                         try:
                             el[k] = row[header.index(keymap[k])]
                         except:
@@ -562,7 +562,7 @@ def query_orig(request_inputs, queryType, doformat=False):
             imageDigest = image_report['imageDigest']
             query_data = catalog.get_document(user_auth, 'query_data', imageDigest)
             if not queryType:
-                return_object[imageDigest] = query_data.keys()
+                return_object[imageDigest] = list(query_data.keys())
             elif queryType in query_data:
                 if doformat:
                     return_object[imageDigest] = make_response_query(queryType, query_data[queryType])
@@ -792,7 +792,7 @@ def get_image_content_by_type(imageDigest, ctype):
             return_object = {
                 'imageDigest': imageDigest,
                 'content_type': ctype,
-                'content': return_object.values()[0]
+                'content': list(return_object.values())[0]
             }
 
     except Exception as err:
@@ -857,7 +857,7 @@ def get_image_vulnerabilities_by_type(imageDigest, vtype):
             return_object = {
                 'imageDigest': imageDigest,
                 'vulnerability_type': vulnerability_type,
-                'vulnerabilities': return_object.values()[0]
+                'vulnerabilities': list(return_object.values())[0]
             }
 
     except Exception as err:

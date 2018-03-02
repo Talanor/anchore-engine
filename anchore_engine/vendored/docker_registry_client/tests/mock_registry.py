@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 from flexmock import flexmock
 from docker_registry_client import _BaseClient

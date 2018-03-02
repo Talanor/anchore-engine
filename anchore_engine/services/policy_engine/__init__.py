@@ -79,7 +79,7 @@ def _init_distro_mappings():
             distro_mappings = dbsession.query(DistroMapping).all()
 
             for i in initial_mappings:
-                if not filter(lambda x: x.from_distro == i.from_distro, distro_mappings):
+                if not [x for x in distro_mappings if x.from_distro == i.from_distro]:
                     logger.info('Adding missing mapping: {}'.format(i))
                     dbsession.add(i)
 

@@ -146,7 +146,7 @@ class ImageLoader(object):
 
         # Re-organize the data from file-keyed to package keyed for efficient filtering
         packages = {}
-        for path, file_meta in file_records.items():
+        for path, file_meta in list(file_records.items()):
             for r in json.loads(file_meta):
                 pkg = r.pop('package')
                 if not pkg:
@@ -164,7 +164,7 @@ class ImageLoader(object):
             if not pkg_entry:
                 continue
 
-            for f_name, entry in pkg_entry.items():
+            for f_name, entry in list(pkg_entry.items()):
                 meta = ImagePackageManifestEntry()
                 meta.pkg_name = package.name
                 meta.pkg_version = package.version
@@ -220,7 +220,7 @@ class ImageLoader(object):
         matches = retrieve_files_json.get('file_content.all', {}).get('base', {})
         records = []
 
-        for filename, match_string in matches.items():
+        for filename, match_string in list(matches.items()):
             match = AnalysisArtifact()
             match.image_user_id = image_obj.user_id
             match.image_id = image_obj.id
@@ -252,7 +252,7 @@ class ImageLoader(object):
         matches = content_search_json.get('regexp_matches.all', {}).get('base', {})
         records = []
 
-        for filename, match_string in matches.items():
+        for filename, match_string in list(matches.items()):
             match = AnalysisArtifact()
             match.image_user_id = image_obj.user_id
             match.image_id = image_obj.id
@@ -285,7 +285,7 @@ class ImageLoader(object):
         matches = content_search_json.get('regexp_matches.all', {}).get('base', {})
         records = []
 
-        for filename, match_string in matches.items():
+        for filename, match_string in list(matches.items()):
             match = AnalysisArtifact()
             match.image_user_id = image_obj.user_id
             match.image_id = image_obj.id
@@ -316,13 +316,13 @@ class ImageLoader(object):
         img_distro = DistroNamespace.for_obj(image_obj)
 
         # pkgs.allinfo handling
-        pkgs_all = package_analysis_json.get('pkgs.allinfo', {}).values()
+        pkgs_all = list(package_analysis_json.get('pkgs.allinfo', {}).values())
         if not pkgs_all:
             return []
         else:
             pkgs_all = pkgs_all[0]
 
-        for pkg_name, metadata_str in pkgs_all.items():
+        for pkg_name, metadata_str in list(pkgs_all.items()):
             metadata = json.loads(metadata_str)
 
             p = ImagePackage()
@@ -368,7 +368,7 @@ class ImageLoader(object):
         all_pkgs = package_analysis_json['pkgs.all']['base']
         all_pkgs_src = package_analysis_json['pkgs_plus_source.all']['base']
 
-        for pkg_name, version in all_pkgs.items():
+        for pkg_name, version in list(all_pkgs.items()):
             p = ImagePackage()
             p.image_user_id = image_obj.user_id
             p.image_id = image_obj.id
@@ -414,7 +414,7 @@ class ImageLoader(object):
         suids = analysis_report_json.get('file_suids', {}).get('files.suids', {}).get('base', {})
         pkgd = analysis_report_json.get('package_list', {}).get('pkgfiles.all', {}).get('base', [])
 
-        path_map = {path: json.loads(value) for path, value in all_infos.items()}
+        path_map = {path: json.loads(value) for path, value in list(all_infos.items())}
         entry = FilesystemAnalysis()
         entry.file_count = 0
         entry.directory_count = 0
@@ -427,7 +427,7 @@ class ImageLoader(object):
         # for item in items:
         #     f = item.json()
 
-        for path, metadata in path_map.items():
+        for path, metadata in list(path_map.items()):
             try:
                 full_path = metadata['fullpath']
                 f = {
@@ -475,7 +475,7 @@ class ImageLoader(object):
             return []
 
         npms = []
-        for path, npm_str in npms_json.items():
+        for path, npm_str in list(npms_json.items()):
             npm_json = json.loads(npm_str)
             n = ImageNpm()
             n.path_hash = hashlib.sha256(path).hexdigest()
@@ -498,7 +498,7 @@ class ImageLoader(object):
             return []
 
         gems = []
-        for path, gem_str in gems_json.items():
+        for path, gem_str in list(gems_json.items()):
             gem_json = json.loads(gem_str)
             n = ImageGem()
             n.path_hash = hashlib.sha256(path).hexdigest()

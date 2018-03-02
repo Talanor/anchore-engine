@@ -88,25 +88,25 @@ def terminate_service(service, flush_pidfile=False):
                 thepid = int(FH.read())
 
         if thepid:
-            print "Found old pid for service: {}. Terminating it".format(service)
+            print("Found old pid for service: {}. Terminating it".format(service))
             try:
                 os.kill(thepid, 0)
             except OSError:
                 pass
             else:
-                print "killing old twistd pid: " + str(thepid)
+                print("killing old twistd pid: " + str(thepid))
                 os.kill(thepid, 9)
             if flush_pidfile:
                 os.remove(pidfile)
     except Exception as err:
-        print "could not shut down running twistd - exception: " + str(err)
+        print("could not shut down running twistd - exception: " + str(err))
 
 def startup_service(service, configdir):
     pidfile = "/var/run/"+service+".pid"
     logfile = "/var/log/anchore/"+service+".log"
     #os.environ['ANCHORE_LOGFILE'] = logfile
     
-    print "cleaning up service: " + str(service)
+    print("cleaning up service: " + str(service))
     terminate_service(service, flush_pidfile=True)
 
     twistd_cmd = '/bin/twistd'
@@ -115,8 +115,8 @@ def startup_service(service, configdir):
             twistd_cmd = f
 
     cmd = [twistd_cmd, '--logger=anchore_engine.subsys.twistd_logger.logger', '--pidfile', pidfile, "-n", service, '--config', configdir]
-    print "starting service: " + str(service)
-    print "\t " + ' '.join(cmd)
+    print("starting service: " + str(service))
+    print("\t " + ' '.join(cmd))
 
     try:
         #status = subprocess.call(cmd)
@@ -128,9 +128,9 @@ def startup_service(service, configdir):
         raise Exception("process exited: " + str(rc))
     except Exception as err:
         traceback.print_exc()
-        print "service process exited at ("+str(time.ctime())+"): " + str(err)
+        print("service process exited at ("+str(time.ctime())+"): " + str(err))
 
-    print "exiting service thread"
+    print("exiting service thread")
     return(False)
 
 service_map = {
@@ -140,10 +140,10 @@ service_map = {
 configdirs = []
 try:
     configdirs.append(sys.argv[1])
-except:
+except IndexError:
     pass
 
-if not configdirs:
+if configdirs:
     configdirs.append("/config")
 
 configfile = configdir = None
@@ -155,16 +155,16 @@ for thedir in configdirs:
         try: 
             localconfig = anchore_engine.configuration.localconfig.read_config(configfile=configfile)
         except Exception as err:
-            print "cannot load local configuration: " + str(err)
+            print("cannot load local configuration: " + str(err))
             sys.exit(1)
         break
 
 if not configdir or not os.path.exists(configdir):
-    print "cannot locate configdir/config.yaml in ("+str(configdirs)+"): directory needs to exist with a valid config.yaml within"
+    print("cannot locate configdir/config.yaml in ("+str(configdirs)+"): directory needs to exist with a valid config.yaml within")
     sys.exit(1)
 
 if not configfile or not os.path.exists(configfile):
-    print "cannot locate configfile (config.yaml) in ("+str(configdirs)+"): valid config.yaml must exist"
+    print("cannot locate configfile (config.yaml) in ("+str(configdirs)+"): valid config.yaml must exist")
     sys.exit(1)
 
 startFailed = False
@@ -175,9 +175,9 @@ else:
 
 try:
     if not os.path.exists("/var/log/anchore"):
-        os.makedirs("/var/log/anchore/", 0755)
+        os.makedirs("/var/log/anchore/", 0o755)
 except Exception as err:
-    print "cannot create log directory /var/log/anchore - exception: " + str(err)
+    print("cannot create log directory /var/log/anchore - exception: " + str(err))
     raise err
 
 pids = []
@@ -195,10 +195,10 @@ for service in services:
 
     except Exception as err:
         startFailed = True
-        print "service start failed - exception: " + str(err)
+        print("service start failed - exception: " + str(err))
 
 if startFailed:
-    print "one or more services failed to start. cleanly terminating the others"
+    print("one or more services failed to start. cleanly terminating the others")
     for service in services:
         terminate_service(service, flush_pidfile=True)
 
@@ -215,7 +215,7 @@ else:
                 if 'auto_restart_services' in localconfig and localconfig['auto_restart_services']:
                     for service_thread in keepalive_threads:
                         if not service_thread.thread.is_alive():
-                            print "restarting service " + service_thread.thread.name
+                            print("restarting service " + service_thread.thread.name)
                             service_thread.start()
 
         except KeyboardInterrupt:
@@ -223,7 +223,7 @@ else:
         observer.join()
 
     except Exception as err:
-        print "failed to startup log watchers - exception: " + str(err)
+        print("failed to startup log watchers - exception: " + str(err))
         raise err
 
 sys.exit(0)

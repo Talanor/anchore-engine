@@ -23,7 +23,7 @@ def create(queueName, userId, session=None):
         record = newrecord
 
     if record:
-        ret = dict((key,value) for key, value in vars(record).iteritems() if not key.startswith('_'))
+        ret = dict((key,value) for key, value in list(vars(record).items()) if not key.startswith('_'))
         
     return(ret)
 
@@ -41,7 +41,7 @@ def is_inqueue(queueName, userId, data, session=None):
     dataId, datajson = generate_dataId(data)
     result = session.query(Queue).filter_by(queueName=queueName, userId=userId, dataId=dataId).first()
     if result:
-        dbobj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+        dbobj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
         ret.update(dbobj)
         ret['data'] = json.loads(dbobj['data'])
 
@@ -83,7 +83,7 @@ def dequeue(queueName, userId, session=None):
 
     if result:
         result.update({'popped': True})
-        dbobj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+        dbobj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
         ret.update(dbobj)
         ret['data'] = json.loads(dbobj['data'])
         #ret = json.loads(dbobj['data'])
@@ -121,7 +121,7 @@ def get_all(session=None):
 
     our_results = session.query(Queue)
     for result in our_results:
-        ret.append(dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_')))
+        ret.append(dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_')))
 
     return(ret)
 
@@ -133,7 +133,7 @@ def get_byuserId(userId, session=None):
 
     our_results = session.query(Queue).filter_by(userId=userId)
     for result in our_results:
-        ret.append(dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_')))
+        ret.append(dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_')))
 
     return(ret)
 

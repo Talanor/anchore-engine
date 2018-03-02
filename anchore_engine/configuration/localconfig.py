@@ -176,14 +176,14 @@ def read_config(configfile=None, validate_params={}):
                 except Exception as err:
                     raise err
 
-            for e in os.environ.keys():
+            for e in list(os.environ.keys()):
                 if re.match("^ANCHORE.*", e):
                     anchore_envs[e] = str(os.environ[e])
 
             if anchore_envs:
                 confbufcopy = confbuf
                 try:
-                    for e in anchore_envs.keys():
+                    for e in list(anchore_envs.keys()):
                         confbufcopy = confbufcopy.replace("${"+str(e)+"}", anchore_envs[e])
                 except Exception as err:
                     logger.warn("problem replacing configuration variable values with overrides - exception: " + str(err))
@@ -225,7 +225,7 @@ def validate_config(config, validate_params={}):
         if validate_params['services'] and ('services' not in config or not config['services']):
             raise Exception("no 'services' definition in configuration file")
         elif validate_params['services']:
-            for k in config['services'].keys():
+            for k in list(config['services'].keys()):
                 if not config['services'][k] or 'enabled' not in config['services'][k]:
                     raise Exception("service (" + str(
                         k) + ") defined, but no values are specified (need at least 'enabled: <True|False>')")
@@ -270,7 +270,7 @@ def validate_config(config, validate_params={}):
             if 'admin' not in credentials['users']:
                 raise Exception("no 'admin' user defined in 'credentials'/'users' section of configuration file")
             else:
-                for username in credentials['users'].keys():
+                for username in list(credentials['users'].keys()):
                     if not credentials['users'][username]:
                         raise Exception("missing details for user '"+str(username)+"' in configuration file")
                     user = credentials['users'][username]

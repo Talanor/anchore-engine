@@ -5,7 +5,7 @@ from twisted.application.service import IServiceMaker
 from twisted.plugin import IPlugin
 from twisted.python import log
 from twisted.python import usage
-from zope.interface import implements
+from zope.interface.declarations import implementer
 
 from anchore_engine.configuration import localconfig
 # anchore modules
@@ -21,14 +21,14 @@ class Options(usage.Options):
         ["config", "c", None, "Configuration directory location."]
     ]
 
+@implementer(IServiceMaker, IPlugin)
 class AnchoreServiceMaker(object):
-    implements(IServiceMaker, IPlugin)
     tapname = "anchore-kubernetes-webhook"
     servicenames = ["kubernetes_webhook"]
     description = "Anchore Container Image Scanner Service: " + ','.join(servicenames)
     options = Options
 
-    def makeService(self, options): 
+    def makeService(self, options):
         # this works, consider better logging in non-twistd way: https://docs.python.org/2/howto/logging.html#logging-advanced-tutorial
         #logging.basicConfig(format='%(asctime)-15s %(levelname)s %(filename)s:%(funcName)s %(message)s', filename="/tmp/"+self.tapname+".log", level='DEBUG')
         #_logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ class AnchoreServiceMaker(object):
 
         try:
             config_services = config['services']
-            
+
             isEnabled = False
             for sname in slist:
                 if 'log_level' in config_services[sname]:
@@ -62,7 +62,7 @@ class AnchoreServiceMaker(object):
                 if config_services[sname]['enabled']:
                     isEnabled = True
                     break
-                    
+
             if not isEnabled:
                 log.err("no services in list ("+str(self.servicenames)+") are enabled in configuration file: shutting down")
                 sys.exit(0)

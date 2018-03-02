@@ -2,13 +2,14 @@ from zope.interface import implements
 
 from twisted.cred import checkers, credentials, error as credError
 from twisted.internet import defer
-from zope.interface import implements
+from zope.interface.declarations import implementer
 
 from anchore_engine.db import db_users
 from anchore_engine.db import session_scope
 
+
+@implementer(checkers.ICredentialsChecker)
 class AnchorePasswordChecker:
-    implements(checkers.ICredentialsChecker)
     credentialInterfaces = (credentials.IUsernamePassword,)
 
     def requestAvatarId(self, credentials):

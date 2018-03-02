@@ -3,7 +3,7 @@ from requests import get, put, delete, Response, head
 from requests.exceptions import HTTPError
 import json
 import re
-import urlparse
+import urllib.parse
 import datetime
 import base64
 
@@ -43,7 +43,7 @@ class CommonBaseClient(object):
                           data=data, headers=headers, **self.method_kwargs)
         logger.debug("%s %s", response.status_code, response.reason)
         if response.status_code == 307 or response.status_code == 301:
-            redirect_url = urlparse.urlparse(response.headers['Location'])
+            redirect_url = urllib.parse.urlparse(response.headers['Location'])
             response = method(redirect_url.geturl(), data=data, headers=headers, **self.method_kwargs)
         if not response.ok:
             logger.debug("Error response: %r", response.text)
@@ -131,7 +131,7 @@ class OAuth2TokenHandler(GenericTokenHandler):
         :param params:
         :return: token associated with params values (e.g. scope, service)
         """
-        matches = filter(lambda x: x['params'] == params, self._tokens.values())
+        matches = [x for x in list(self._tokens.values()) if x['params'] == params]
         if len(matches) > 0:
             for m in matches:
                 if m['expiration'] > datetime.datetime.utcnow():
@@ -173,7 +173,7 @@ class OAuth2TokenHandler(GenericTokenHandler):
         :return:
         """
         logger.debug('Flushing token: {}'.format(token))
-        for path, cached_token in self._tokens.items():
+        for path, cached_token in list(self._tokens.items()):
             if cached_token['raw_token']['token'] == token:
                 self._tokens.pop(path)
 
@@ -233,7 +233,7 @@ class OAuth2TokenHandler(GenericTokenHandler):
             self._add_token(path=path, url=req_url, params=req_params, raw_token=response.json())
             logger.debug('Added new token to cache and returning to caller')
             return self._tokens[path]['raw_token']
-        except HTTPError, e:
+        except HTTPError as e:
             raise e
 
 
@@ -274,7 +274,7 @@ class BasicAuthTokenHandler(GenericTokenHandler):
                 self._token = base64.standard_b64encode('{}:{}'.format(self.username if self.username else '', self.password if self.password else ''))
                 logger.debug('Added new token to cache and returning to caller')
                 return {'token': self._token}
-            except HTTPError, e:
+            except HTTPError as e:
                 raise e
 
 
@@ -328,7 +328,7 @@ class AuthCommonBaseClient(CommonBaseClient):
                     try:
                         response = super(AuthCommonBaseClient, self)._http_response(url, method, data=data, headers=headers, **kwargs)
                         return response
-                    except HTTPError, e:
+                    except HTTPError as e:
                         raise e
 
                 else:

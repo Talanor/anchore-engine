@@ -3,7 +3,7 @@ Exceptions related to policy initialization and evaluation
 """
 
 
-class PolicyError(StandardError):
+class PolicyError(Exception):
     """
     Base type for all policy-specific errors
     """
@@ -118,7 +118,7 @@ class ValidationError(PolicyError):
     """
 
     def details(self):
-        return "{} ({})".format(self.message, ','.join(['{}={}'.format(y[0], y[1]) for y in filter(lambda x: x[0] != 'message' and not x[0].startswith('_'), vars(self).items())]))
+        return "{} ({})".format(self.message, ','.join(['{}={}'.format(y[0], y[1]) for y in [x for x in list(vars(self).items()) if x[0] != 'message' and not x[0].startswith('_')]]))
 
 
 class ReferencedObjectNotFoundError(ValidationError):

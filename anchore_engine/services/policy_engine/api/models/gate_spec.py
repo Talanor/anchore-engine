@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from __future__ import absolute_import
+
 from .trigger_spec import TriggerSpec
 from .base_model_ import Model
 from datetime import date, datetime

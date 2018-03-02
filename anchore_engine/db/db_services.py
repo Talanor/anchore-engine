@@ -76,7 +76,7 @@ def get_all(session=None):
 
     our_results = session.query(Service)
     for result in our_results:
-        ret.append(dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_')))
+        ret.append(dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_')))
 
     return(ret)
 
@@ -88,7 +88,7 @@ def get(hostid, servicename, session=None):
 
     result = session.query(Service).filter_by(hostid=hostid).filter_by(servicename=servicename).first()
     if result:
-        ret.update(dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_')))
+        ret.update(dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_')))
 
     return(ret)
 
@@ -101,7 +101,7 @@ def get_byname(servicename, session=None):
     results = session.query(Service).filter_by(servicename=servicename)
     if results:
         for result in results:
-            dbobj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+            dbobj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
             ret.append(dbobj)
 
     return(ret)

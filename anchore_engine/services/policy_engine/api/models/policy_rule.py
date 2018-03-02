@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from __future__ import absolute_import
+
 from .policy_rule_params import PolicyRuleParams
 from .base_model_ import Model
 from datetime import date, datetime

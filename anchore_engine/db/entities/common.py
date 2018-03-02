@@ -43,8 +43,8 @@ def get_entity_tables(entity):
 
     import inspect
             
-    entity_names = [x[1].__tablename__ for x in filter(lambda x: inspect.isclass(x[1]) and issubclass(x[1], Base) and x[1] != Base, inspect.getmembers(entity))]
-    ftables = filter(lambda x: x.name in entity_names, Base.metadata.sorted_tables)
+    entity_names = [x[1].__tablename__ for x in [x for x in inspect.getmembers(entity) if inspect.isclass(x[1]) and issubclass(x[1], Base) and x[1] != Base]]
+    ftables = [x for x in Base.metadata.sorted_tables if x.name in entity_names]
 
     return(ftables)
 
@@ -186,8 +186,8 @@ def initialize(localconfig=None, versions=None, bootstrap_db=False, specific_tab
                     raise Exception(
                         "Initialization failed: could not add users from config into DB - exception: " + str(err))
 
-        print ("Starting up version: " + json.dumps(versions))
-        print ("\tDB version: " + json.dumps(version_record))
+        print(("Starting up version: " + json.dumps(versions)))
+        print(("\tDB version: " + json.dumps(version_record)))
 
         try:
             rc = do_upgrade(version_record, versions)
@@ -209,7 +209,7 @@ def do_upgrade(inplace, incode):
         raise Exception("DB downgrade not supported")
 
     if inplace['db_version'] != incode['db_version']:
-        print ("upgrading DB: from=" + str(inplace['db_version']) + " to=" + str(incode['db_version']))
+        print(("upgrading DB: from=" + str(inplace['db_version']) + " to=" + str(incode['db_version'])))
 
         if upgrade_enabled:
             db_current = inplace['db_version']
@@ -227,10 +227,10 @@ def do_upgrade(inplace, incode):
                     # Upgrade code is for older version, skip it.
                     continue
                 else:
-                    print("Executing upgrade functions for version {} to {}".format(db_from, db_to))
+                    print(("Executing upgrade functions for version {} to {}".format(db_from, db_to)))
                     for fn in functions_to_run:
                         try:
-                            print("Executing upgrade function: {}".format(fn.__name__))
+                            print(("Executing upgrade function: {}".format(fn.__name__)))
                             fn()
                         except Exception as e:
                             log.exception('Upgrade function {} raised an error. Failing upgrade.'.format(fn.__name__))
@@ -239,7 +239,7 @@ def do_upgrade(inplace, incode):
                     db_current = db_to
 
     if inplace['service_version'] != incode['service_version']:
-        print ("upgrading service: from=" + str(inplace['service_version']) + " to=" + str(incode['service_version']))
+        print(("upgrading service: from=" + str(inplace['service_version']) + " to=" + str(incode['service_version'])))
 
     ret = True
     return (ret)

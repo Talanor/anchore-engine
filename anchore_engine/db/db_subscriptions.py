@@ -39,7 +39,7 @@ def get_all_byuserId(userId, session=None):
 
     our_results = session.query(Subscription).filter_by(userId=userId)
     for result in our_results:
-        obj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+        obj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
         ret.append(obj)
 
     return(ret)
@@ -52,7 +52,7 @@ def get_all(session=None):
 
     our_results = session.query(Subscription)
     for result in our_results:
-        obj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+        obj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
         ret.append(obj)
 
     return(ret)
@@ -66,7 +66,7 @@ def get(userId, subscription_id, session=None):
     result = session.query(Subscription).filter_by(userId=userId, subscription_id=subscription_id).first()
 
     if result:
-        obj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+        obj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
         ret = obj
 
     return(ret)
@@ -83,7 +83,7 @@ def get_byfilter(userId, session=None, **dbfilter):
     #results = session.query(Subscription).filter_by(userId=userId, subscription_key=subscription_key)
     if results:
         for result in results:
-            obj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+            obj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
             ret.append(obj)
 
     return(ret)
@@ -99,7 +99,7 @@ def get_bysubscription_key(userId, subscription_key, session=None):
 
     if results:
         for result in results:
-            obj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+            obj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
             ret.append(obj)
 
     return(ret)

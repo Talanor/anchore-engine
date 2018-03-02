@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 from docker_registry_client.Image import Image
 from docker_registry_client._BaseClient import BaseClientV1

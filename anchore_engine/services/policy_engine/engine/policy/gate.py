@@ -32,7 +32,7 @@ class GateMeta(type):
         return cls.registry[name.lower()]
 
     def registered_gate_names(cls):
-        return cls.registry.keys()
+        return list(cls.registry.keys())
 
 
 class ExecutionContext(object):
@@ -126,7 +126,7 @@ class BaseTrigger(object):
             kwargs = {}
 
         # Find all class objects that are params
-        for attr_name, param_obj in params.items():
+        for attr_name, param_obj in list(params.items()):
             try:
                 setattr(self, attr_name, copy.deepcopy(param_obj))
                 getattr(self, attr_name).set_value(kwargs.get(param_obj.name, None))
@@ -136,9 +136,9 @@ class BaseTrigger(object):
         # Then, check for any parameters provided that are not defined in the trigger.
         if kwargs:
             given_param_names = set(kwargs.keys())
-            for i in given_param_names.difference(set([x.name for x in params.values()])):
+            for i in given_param_names.difference(set([x.name for x in list(params.values())])):
                 # Need to aggregate and return all invalid if there is more than one
-                invalid_params.append(InvalidParameterError(i, params.keys(), trigger=self.__trigger_name__, gate=self.gate_cls.__gate_name__))
+                invalid_params.append(InvalidParameterError(i, list(params.keys()), trigger=self.__trigger_name__, gate=self.gate_cls.__gate_name__))
 
         if invalid_params:
             raise PolicyRuleValidationErrorCollection(invalid_params, trigger=self.__trigger_name__, gate=self.gate_cls.__gate_name__)
@@ -151,14 +151,14 @@ class BaseTrigger(object):
         :return: dict of (name -> obj) tuples enumerating all TriggerParameter objects defined for this class
         """
 
-        return {x.name: x.object for x in filter(lambda attr: attr.kind == 'data' and isinstance(attr.object, anchore_engine.services.policy_engine.engine.policy.params.TriggerParameter), inspect.classify_class_attrs(cls))}
+        return {x.name: x.object for x in [attr for attr in inspect.classify_class_attrs(cls) if attr.kind == 'data' and isinstance(attr.object, anchore_engine.services.policy_engine.engine.policy.params.TriggerParameter)]}
 
     def parameters(self):
         """
         Returns a map of display names of the TriggerParameters defined for this Trigger to values
         :return:
         """
-        return {attr_name: getattr(self, attr_name) for attr_name in self._parameters().keys()}
+        return {attr_name: getattr(self, attr_name) for attr_name in list(self._parameters().keys())}
 
     def legacy_str(self):
         """
@@ -246,7 +246,7 @@ class BaseTrigger(object):
         return '<{}.{} object Name:{}, TriggerId:{}, Params:{}>'.format(self.__class__.__module__, self.__class__.__name__, self.__trigger_name__, self.__trigger_id__, self.parameters() if self.parameters() else [])
 
 
-class Gate(object):
+class Gate(object, metaclass=GateMeta):
     """
     Base type for a gate module.
     
@@ -269,7 +269,6 @@ class Gate(object):
     The result of a gate evaluation is an ExecutionResult.
     
     """
-    __metaclass__ = GateMeta
 
     __gate_name__ = None
     __triggers__ = []
@@ -282,7 +281,7 @@ class Gate(object):
         :param name: 
         :return: 
         """
-        return any(map(lambda x: x.__trigger_name__.lower() == name.lower(), cls.__triggers__))
+        return any([x.__trigger_name__.lower() == name.lower() for x in cls.__triggers__])
 
     @classmethod
     def trigger_names(cls):
@@ -298,7 +297,7 @@ class Gate(object):
 
         name = name.lower()
 
-        found = filter(lambda x: x.__trigger_name__.lower() == name, cls.__triggers__)
+        found = [x for x in cls.__triggers__ if x.__trigger_name__.lower() == name]
         if found:
             return found[0]
         else:

@@ -84,7 +84,7 @@ def item_diffs(old_items=None, new_items=None):
     added = [new_items[x] for x in new_ids.difference(old_ids)]
     removed = [old_items[x] for x in old_ids.difference(new_ids)]
     intersected_ids = new_ids.intersection(old_ids)
-    updated = [new_items[x] for x in filter(lambda x: new_items[x] != old_items[x], intersected_ids)]
+    updated = [new_items[x] for x in [x for x in intersected_ids if new_items[x] != old_items[x]]]
 
     return {
         'added': added,
@@ -127,9 +127,9 @@ def pivot_rows_to_keys(header_list, row_list, key_name, whitelist_headers=None):
     :return:
     """
     header_map = {v: header_list.index(v) for v in
-                  filter(lambda x: not whitelist_headers or x in whitelist_headers or x == key_name, header_list)}
+                  [x for x in header_list if not whitelist_headers or x in whitelist_headers or x == key_name]}
     key_idx = header_map[key_name]
-    return {x[key_idx]: {k: x[v] for k, v in header_map.items()} for x in row_list}
+    return {x[key_idx]: {k: x[v] for k, v in list(header_map.items())} for x in row_list}
 
 
 def filter_record_keys(record_list, whitelist_keys):
@@ -140,5 +140,5 @@ def filter_record_keys(record_list, whitelist_keys):
     :return: a new list with dicts that only contain the whitelisted elements
     """
 
-    filtered = map(lambda x: {k: v for k, v in filter(lambda y: y[0] in whitelist_keys, x.items())}, record_list)
+    filtered = [{k: v for k, v in [y for y in list(x.items()) if y[0] in whitelist_keys]} for x in record_list]
     return filtered

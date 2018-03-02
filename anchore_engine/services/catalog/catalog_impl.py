@@ -353,7 +353,7 @@ def image_imageDigest(dbsession, request_inputs, imageDigest, bodycontent={}):
                 if image_record:
                     
                     return_object, httpcode = do_image_delete(userId, image_record, dbsession, force=params['force'])
-                    if httpcode not in range(200,299):
+                    if httpcode not in list(range(200,299)):
                         raise Exception(return_object)
 
                 else:
@@ -507,7 +507,7 @@ def subscriptions(dbsession, request_inputs, subscriptionId=None, bodycontent={}
             subscription_record = db_subscriptions.get(userId, subscriptionId, session=dbsession)
             if subscription_record:
                 rc, httpcode = do_subscription_delete(userId, subscription_record, dbsession, force=True)
-                if httpcode not in range(200,299):
+                if httpcode not in list(range(200,299)):
                     raise Exception(str(rc))
             
             #dbfilter = {}
@@ -706,7 +706,7 @@ def policies(dbsession, request_inputs, bodycontent={}):
                     cleanup_evals = False
 
                 rc, httpcode = do_policy_delete(userId, policy_record, dbsession, force=True, cleanup_evals=cleanup_evals)
-                if httpcode not in range(200,299):
+                if httpcode not in list(range(200,299)):
                     raise Exception(str(rc))
 
         elif method == 'POST' or method == 'PUT':
@@ -1142,7 +1142,7 @@ def system_registries_registry(dbsession, request_inputs, registry, bodycontent=
             registry_records = db_registries.get(registry, userId, session=dbsession)
             for registry_record in registry_records:
                 rc, httpcode = do_registry_delete(userId, registry_record, dbsession, force=True)
-                if httpcode not in range(200,299):
+                if httpcode not in list(range(200,299)):
                     raise Exception(str(rc))
                     
     except Exception as err:
@@ -1492,8 +1492,8 @@ def add_or_update_image(dbsession, userId, imageId, tags=[], digests=[], anchore
 
     #logger.debug("rationalized input for imageId ("+str(imageId)+"): " + json.dumps(image_ids, indent=4))
     addlist = {}
-    for registry in image_ids.keys():
-        for repo in image_ids[registry].keys():
+    for registry in list(image_ids.keys()):
+        for repo in list(image_ids[registry].keys()):
             imageId = image_ids[registry][repo]['imageId']
             digests = image_ids[registry][repo]['digests']
             tags = image_ids[registry][repo]['tags']
@@ -1565,7 +1565,7 @@ def add_or_update_image(dbsession, userId, imageId, tags=[], digests=[], anchore
                             try:
                                 annotation_data.update(annotations)
                                 final_annotation_data = {}
-                                for k,v in annotation_data.items():
+                                for k,v in list(annotation_data.items()):
                                     if v != 'null':
                                         final_annotation_data[k] = v
                                 image_record['annotations'] = json.dumps(final_annotation_data)
@@ -1581,7 +1581,7 @@ def add_or_update_image(dbsession, userId, imageId, tags=[], digests=[], anchore
                     addlist[imageDigest] = image_record
 
     #logger.debug("final dict of image(s) to add: " + json.dumps(addlist, indent=4))
-    for imageDigest in addlist.keys():
+    for imageDigest in list(addlist.keys()):
         ret.append(addlist[imageDigest])
 
     #logger.debug("returning: " + json.dumps(ret, indent=4))
@@ -1713,7 +1713,7 @@ def get_prune_candidates(resourcetype, dbsession, dangling=True, olderthan=None,
         records = db_users.get_all(session=dbsession)
         for record in records:
             user_records[record['userId']] = record
-        user_ids = user_records.keys()
+        user_ids = list(user_records.keys())
 
         fulltags = []
         image_digests = []
@@ -1728,13 +1728,13 @@ def get_prune_candidates(resourcetype, dbsession, dangling=True, olderthan=None,
         records = db_policybundle.get_all(session=dbsession)
         for record in records:
             policy_records[record['policyId']] = record
-        policy_ids = policy_records.keys()
+        policy_ids = list(policy_records.keys())
 
         eval_records = {}
         records = db_policyeval.get_all(session=dbsession)
         for record in records:
             eval_records[record['evalId']] = record
-        eval_ids = eval_records.keys()
+        eval_ids = list(eval_records.keys())
 
     except Exception as err:
         httpcode = 500
@@ -1756,7 +1756,7 @@ def get_prune_candidates(resourcetype, dbsession, dangling=True, olderthan=None,
                 raise Exception("input resource_type ("+str(resourcetype)+") is not in list of available resource_types ("+str(resource_types)+")")
 
             if resourcetype == 'users':
-                records = user_records.values()
+                records = list(user_records.values())
                 for record in records:
                     dangling_candidate = False
                     prune_candidate = True
@@ -1854,7 +1854,7 @@ def get_prune_candidates(resourcetype, dbsession, dangling=True, olderthan=None,
                         prune_candidates.append(el)                        
 
             elif resourcetype == 'policies':
-                records = policy_records.values()
+                records = list(policy_records.values())
                 for record in records:
                     # dangling_candidate is set if the resource is determined to have no supporting references.  
                     # prune_candidate is unset if the resource should be held, even if supporting resources cannot 
@@ -1996,7 +1996,7 @@ def get_prune_candidates(resourcetype, dbsession, dangling=True, olderthan=None,
 
             elif resourcetype == 'evaluations':
                 #records = db_subscriptions.get_all(session=dbsession)
-                records = eval_records.values()
+                records = list(eval_records.values())
                 for record in records:
                     dangling_candidate = False
                     dangling_reason = "not_set"

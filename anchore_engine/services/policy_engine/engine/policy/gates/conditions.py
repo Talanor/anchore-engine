@@ -12,8 +12,8 @@ class AttributeListValidator(InputValidator):
 
     def __call__(self, *args, **kwargs):
         if args and args[0]:
-            parts = map(lambda x: x.strip(), args[0].split(','))
-            return not bool(filter(lambda x: x not in self.attrs, parts))
+            parts = [x.strip() for x in args[0].split(',')]
+            return not bool([x for x in parts if x not in self.attrs])
         else:
             return False
 
@@ -37,11 +37,11 @@ class CheckOperations(InputValidator):
         return self.ops[name]
 
     def validation_criteria(self):
-        return 'In: {}'.format(','.join(self.ops.keys()))
+        return 'In: {}'.format(','.join(list(self.ops.keys())))
 
     def __call__(self, *args, **kwargs):
         if args and args[0]:
-            return args[0].strip() in self.ops.keys()
+            return args[0].strip() in list(self.ops.keys())
         return False
 
 

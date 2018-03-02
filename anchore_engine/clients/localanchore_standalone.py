@@ -128,7 +128,7 @@ def squash(unpackdir, cachedir, layers):
                             break
 
         # build up the list of excludes as we move down the layers
-        for l in l_excludes.keys():
+        for l in list(l_excludes.keys()):
             myexcludes.update(l_excludes[l])
 
         l_excludes[layer] = myexcludes
@@ -233,7 +233,7 @@ def squash_orig(unpackdir, layers):
             if member.name in allfiles:
                 skip = True
             else:
-                if member.name in excludes.keys():
+                if member.name in list(excludes.keys()):
                     skip = True
                 elif excludes:
                     # discover if file is in an excluded directory
@@ -296,7 +296,7 @@ def make_staging_dirs(rootdir, use_cache_dir=None):
         'cachedir': use_cache_dir
     }
 
-    for k in ret.keys():
+    for k in list(ret.keys()):
         if not ret[k]:
             continue
 
@@ -310,7 +310,7 @@ def make_staging_dirs(rootdir, use_cache_dir=None):
     return(ret)
 
 def delete_staging_dirs(staging_dirs):
-    for k in staging_dirs.keys():
+    for k in list(staging_dirs.keys()):
         if k == 'cachedir':
             continue
 

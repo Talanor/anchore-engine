@@ -66,8 +66,7 @@ class SimpleMemoryBundleCache(object):
 class WhitelistAwarePolicyDecider(object):
     @classmethod
     def decide(cls, decisions):
-        candidate_actions = map(lambda x: x.action,
-                                filter(lambda d: not getattr(d, 'is_whitelisted', False), decisions))
+        candidate_actions = [x.action for x in [d for d in decisions if not getattr(d, 'is_whitelisted', False)]]
         if candidate_actions:
             return min(candidate_actions)
         else:
@@ -351,7 +350,7 @@ class ExecutablePolicyRule(object):
         try:
             self.action = GateAction.__members__[action]
         except KeyError:
-            raise InvalidGateAction(gate=self.gate_name, trigger=self.trigger_name, rule_id=self.rule_id, action=action, valid_actions=filter(lambda x: not x.startswith('_'), GateAction.__dict__.keys()))
+            raise InvalidGateAction(gate=self.gate_name, trigger=self.trigger_name, rule_id=self.rule_id, action=action, valid_actions=[x for x in list(GateAction.__dict__.keys()) if not x.startswith('_')])
 
         self.error_exc = None
         self.errors = []
@@ -550,7 +549,7 @@ class ExecutablePolicy(VersionedEntityMixin):
 
         results = []
         errors = []
-        for gate, policy_rules in self.gates.items():
+        for gate, policy_rules in list(self.gates.items()):
             # Initialize the gate object
             gate_obj = gate()
             exec_context = gate_obj.prepare_context(image_obj, context)
@@ -730,7 +729,7 @@ class ExecutableMapping(object):
         else:
             target_tag = tag
 
-        result = filter(lambda y: y.matches(image_obj, target_tag), self.mapping_rules)
+        result = [y for y in self.mapping_rules if y.matches(image_obj, target_tag)]
 
         # Could have more than one match, in which case return the first
         if result and len(result) >= 1:
@@ -1055,7 +1054,7 @@ class ExecutableBundle(VersionedEntityMixin):
                 rule = self.mapping.execute(image_obj=None, tag=self.target_tag)
                 if rule is not None:
                     rules = [rule]
-                    self.mapping.mapping_rules = filter(lambda x: x == rule, self.mapping.mapping_rules)
+                    self.mapping.mapping_rules = [x for x in self.mapping.mapping_rules if x == rule]
                 else:
                     rules = []
 
@@ -1065,7 +1064,7 @@ class ExecutableBundle(VersionedEntityMixin):
             for rule in rules:
                 try:
                     # Build the specified policy for the rule
-                    policy = filter(lambda x: x['id'] == rule.policy_id, self.raw.get('policies', []))
+                    policy = [x for x in self.raw.get('policies', []) if x['id'] == rule.policy_id]
                     if not policy:
                         raise ReferencedObjectNotFoundError(reference_id=rule.policy_id, reference_type='policy')
                     elif len(policy) > 1:
@@ -1081,7 +1080,7 @@ class ExecutableBundle(VersionedEntityMixin):
                 # Build the whitelists for the rule
                 for wl in rule.whitelist_ids:
                     try:
-                        whitelist = filter(lambda x: x['id'] == wl, self.raw.get('whitelists', []))
+                        whitelist = [x for x in self.raw.get('whitelists', []) if x['id'] == wl]
                         if not whitelist:
                             raise ReferencedObjectNotFoundError(reference_id=wl, reference_type='whitelist')
                         elif len(whitelist) > 1:

@@ -34,7 +34,7 @@ def get_all(session=None):
 
     our_results = session.query(EventLog)
     for result in our_results:
-        obj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+        obj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
         ret.append(obj)
 
     return(ret)
@@ -54,7 +54,7 @@ def get(hostId, service_name, message, level, session=None):
     result = session.query(EventLog).filter_by(**dbfilter).first()
 
     if result:
-        obj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+        obj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
         ret = obj
 
     return(ret)
@@ -68,7 +68,7 @@ def get_byfilter(session=None, **dbfilter):
     results = session.query(EventLog).filter_by(**dbfilter)
     if results:
         for result in results:
-            obj = dict((key,value) for key, value in vars(result).iteritems() if not key.startswith('_'))
+            obj = dict((key,value) for key, value in list(vars(result).items()) if not key.startswith('_'))
             ret.append(obj)
 
     return(ret)

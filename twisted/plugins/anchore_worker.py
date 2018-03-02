@@ -7,7 +7,7 @@ from twisted.application.service import IServiceMaker
 from twisted.plugin import IPlugin
 from twisted.python import log
 from twisted.python import usage
-from zope.interface import implements
+from zope.interface.declarations import implementer
 
 # anchore modules
 from anchore_engine.configuration import localconfig
@@ -23,8 +23,8 @@ class Options(usage.Options):
         ["config", "c", None, "Configuration directory location."]
     ]
 
+@implementer(IServiceMaker, IPlugin)
 class AnchoreServiceMaker(object):
-    implements(IServiceMaker, IPlugin)
     tapname = "anchore-worker"
     #servicenames = ['analyzer', 'policyevaluator', 'feedsyncer']
     servicenames = ['analyzer']

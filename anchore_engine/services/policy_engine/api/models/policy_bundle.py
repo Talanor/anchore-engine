@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from __future__ import absolute_import
+
 from .image_selection_rule import ImageSelectionRule
 from .mapping_rule import MappingRule
 from .policy import Policy

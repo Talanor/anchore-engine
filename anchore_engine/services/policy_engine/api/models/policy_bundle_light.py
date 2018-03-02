@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from __future__ import absolute_import
+
 from .policy import Policy
 from .whitelist import Whitelist
 from .base_model_ import Model
